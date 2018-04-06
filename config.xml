@@ -22,7 +22,7 @@
   <concurrentBuild>false</concurrentBuild>
  <builders>
   <hudson.tasks.Shell>
-    <command>aws cloudformation create-stack  --template-body file://jenkins.json --stack-name <stack> --parameters 
+    <command>echo "Hello world"
 </command>
   </hudson.tasks.Shell>
 </builders>
