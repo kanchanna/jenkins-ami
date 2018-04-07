@@ -1,18 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <project>
-  <actions/>
-  <description/>
+  <description></description>
   <keepDependencies>false</keepDependencies>
-<properties>
-  <hudson.model.ParametersDefinitionProperty>
-    <parameterDefinitions>
-      <hudson.model.StringParameterDefinition>
-        <name>MESSAGE</name>
-        <description/>
-        <defaultValue>Hello world!</defaultValue>
-      </hudson.model.StringParameterDefinition>
-    </parameterDefinitions>
-  </hudson.model.ParametersDefinitionProperty>
-</properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -20,12 +10,11 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
- <builders>
-  <hudson.tasks.Shell>
-    <command>echo "Hello world"
-</command>
-  </hudson.tasks.Shell>
-</builders>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#/bin/bash
+echo &quot;Hello&quot;</command>
+    </hudson.tasks.Shell>
+  </builders>
   <publishers/>
   <buildWrappers/>
-</project>
