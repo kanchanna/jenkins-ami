@@ -1,1 +1,1 @@
-aws ec2 run-instances  --launch-template --key-name $1
+aws ec2 run-instances  --launch-template $2 --key-name $1
