@@ -23,7 +23,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./createec2.sh</command>
+      <command>./createec2.sh ${keyname}</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
