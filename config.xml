@@ -11,6 +11,13 @@
           <defaultValue>akey</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+           <hudson.model.StringParameterDefinition>
+          <name>template_file</name>
+          <description>template for elk instancec</description>
+          <defaultValue> https://raw.githubusercontent.com/kanchanna/jenkins-ami/master/elk.json</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+       
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -23,7 +30,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./createec2.sh ${keyname}</command>
+      <command>./createec2.sh ${keyname} ${template_file}</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
