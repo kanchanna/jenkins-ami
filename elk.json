@@ -67,8 +67,8 @@
                                 "#!/bin/bash \n",
                                 "service ufw stop\n",
                                 "apt-get update\n",
-                                "curl -L https://omnitruck.chef.io/install.sh | bash\n"
-                                 "/opt/chef/embedded/bin/gem install berkshelf --no-ri --no-rdoc"
+                                "curl -L https://omnitruck.chef.io/install.sh | bash\n",
+                                 "/opt/chef/embedded/bin/gem install berkshelf --no-ri --no-rdoc\n"
                             ]
                         ]
                     }
