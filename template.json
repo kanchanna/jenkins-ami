@@ -1,0 +1,255 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation : Create a Jenkins server using a single EC2 instance. This template demonstrates using the AWS CloudFormation bootstrap scripts to install jenkins opennjdk at instance launch time. ",
+    "Parameters": {
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+        },
+        "InstanceType": {
+            "Description": "Jenkins EC2 instance type",
+            "Type": "String",
+            "Default": "t2.small",
+            "AllowedValues": [
+                "t2.micro",
+                "t2.small"
+            ],
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "SSHLocation": {
+            "Description": " The IP address range that can be used to SSH to the EC2 instances",
+            "Type": "String",
+            "MinLength": "9",
+            "MaxLength": "18",
+            "Default": "0.0.0.0/0",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        }
+    },
+    "Mappings": {
+        "AWSInstanceType2Arch": {
+            "t2.micro": {
+                "Arch": "HVM64"
+            },
+            "t2.small": {
+                "Arch": "HVM64"
+            }
+        },
+        "AWSInstanceType2NATArch": {
+            "t2.micro": {
+                "Arch": "NATHVM64"
+            },
+            "t2.small": {
+                "Arch": "NATHVM64"
+            }
+        },
+        "AWSRegionArch2AMI": {
+            "us-east-1": {
+                "HVM64": "ami-43a15f3e"
+            }
+        }
+    },
+    "Resources": {
+        "JenkinsInstance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "jenkinsRoleProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "InstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "JenkinsSecurityGroup"
+                    }
+                ],
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash \n",
+                                "service ufw stop\n",
+                                "apt-get update\n",
+                                
+                                "apt-get install python-pip -y\n",
+                                "pip install awscli\n",
+                                "wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -\n",
+                                "sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'\n",
+                                "apt-get update\n",
+                                "apt-get install jenkins -y &&\n",
+                                "wget -O /tmp/config.xml https://raw.githubusercontent.com/kanchanna/jenkins-ami/master/config.xml &&\n",
+                                "java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080/ create-job testjob --username 'admin' --password '`echo | sudo cat /var/lib/jenkins/secrets/initialAdminPassword`' < /tmp/config.xml\n"
+                                ]
+                        ]
+                    }
+                }
+            }
+        },
+        "JenkinsSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enable Jenkins access via port 8080",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": {
+                            "Ref": "SSHLocation"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    },            
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8080",
+                        "ToPort": "8080",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "3d485f1d-fddc-46ee-9ebf-8c79afc2c214"
+                }
+            }
+        },
+        "jenkinsRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "cloudformation:CancelUpdateStack",
+                                        "cloudformation:CreateStack",
+                                        "cloudformation:ListStackResources",
+                                        "cloudformation:DescribeStackEvents",
+                                        "cloudformation:UpdateStack"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        {
+                                            "Ref": "AWS::StackId"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Action": [
+                                        "ec2:StartInstances",
+                                        "ec2:RunInstances",
+                                        "ec2:DescribeInstances",
+                                        "ec2:DescribeInstanceStatus",
+                                        "ec2:AuthorizeSecurityGroupIngress"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        },
+                        "PolicyName": "JenkinsPolicies"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "jenkinsRoleProfile": {
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "jenkinsRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        }
+    },
+    "Outputs": {
+        "WebsiteURL": {
+            "Description": "Jenkins   application URL",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "http://",
+                        {
+                            "Fn::GetAtt": [
+                                "JenkinsInstance",
+                                "PublicIp"
+                            ]
+                        },
+                        ":8080"
+                    ]
+                ]
+            }
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "3d485f1d-fddc-46ee-9ebf-8c79afc2c214": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 270,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            }
+        }
+    }
+}
