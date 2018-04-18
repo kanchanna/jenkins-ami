@@ -1,5 +1,5 @@
 # jenkins-ami
-cloud formation template 
+cloud formation template \n
 It assumes the presence of default VPC and launches ubuntu ec2 instance in the us east region with ubuntu ami(hardcoded machine image) and instance types t2.small and t2.micro.
 Bootstrap script is configured to install jenkins and configure a new job to launch a new EC2 ubuntu instance in the us east region(Assumes the presence of a default VOC and secirity group and default public IP assignment). New Ec2 instance requires ssh key parameter for the instance launch. A default akey parameter is configured, in which case akey is assumed to be present in AWS and the the private key is available with the user. 
 
