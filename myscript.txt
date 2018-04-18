@@ -9,5 +9,6 @@ cd /home/ubuntu
 mkdir .chef
 mkdir cookbooks
 cd .chef/cookbooks
-tar -xvf /tmp/chefdk.deb
-sudo chef-client --local-mode --runlist 'recipe[ELK-ubuntu::installElasticSearch],recipe[ELK-ubuntu::installLogstash],recipe[ELK-ubuntu::installKibana]'
+wget https://github.com/kanchanna/jenkins-ami/blob/master/ELK-ubuntu.tgz?raw=true
+tar -xvf ELK-ubuntu.tgz
+chef-client --local-mode --runlist 'recipe[ELK-ubuntu::installElasticSearch],recipe[ELK-ubuntu::installLogstash],recipe[ELK-ubuntu::installKibana]'
