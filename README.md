@@ -1,7 +1,9 @@
 # jenkins-ami
-It assumes the presence of default VPC and launches ubuntu ec2 inistance in the hardcoded east region with ami id and instance types t2.small and t2.micro.
+cloud formation template 
+It assumes the presence of default VPC and launches ubuntu ec2 instance in the us east region with ubuntu ami(hardcoded machine image) and instance types t2.small and t2.micro.
+Bootstrap script is configured to install jenkins and configure a new job to launch a new EC2 ubuntu instance in the us east region(Assumes the presence of a default VOC and secirity group and default public IP assignment). New Ec2 instance requires ssh key parameter for the instance launch. A default akey parameter is configured, in which case akey is assumed to be present in AWS and the the private key is available with the user. 
 
-It launches the EC2 instance with parameters as user input, ssh key, ssh location cidr range & stack name. User data is configured with a set of bootstrap commands to install aws client and jenkins and their dependencies.
-jenkins-client.jar is used to create a job from config.xml copied onto the temporary location /tmp
-Thus far only creation of job is completed. The part of launching chef to install ELK is in progress.
+Bootstrap script for the new ec2 instance is configured to install chef dk, chef client and the cookbooks are downloaded from the git repository. The chef-client is run to install the ELK stack from the cookbook.
+
+
 
