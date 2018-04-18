@@ -3,3 +3,11 @@ service ufw stop
 apt-get update
 curl -L https://omnitruck.chef.io/install.sh | bash
 /opt/chef/embedded/bin/gem install berkshelf --no-ri --no-rdoc
+wget -O /tmp/chefdk.deb https://packages.chef.io/files/stable/chefdk/2.4.17/ubuntu/16.04/chefdk_2.4.17-1_amd64.deb
+dpkg -i chefdk.deb
+cd /home/ubuntu
+mkdir .chef
+mkdir cookbooks
+cd .chef/cookbooks
+tar -xvf /tmp/chefdk.deb
+sudo chef-client --local-mode --runlist 'recipe[ELK-ubuntu::installElasticSearch],recipe[ELK-ubuntu::installLogstash],recipe[ELK-ubuntu::installKibana]'
