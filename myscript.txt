@@ -1,0 +1,5 @@
+#!/bin/bash
+service ufw stop
+apt-get update
+curl -L https://omnitruck.chef.io/install.sh | bash
+/opt/chef/embedded/bin/gem install berkshelf --no-ri --no-rdoc
