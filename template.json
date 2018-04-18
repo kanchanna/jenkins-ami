@@ -107,7 +107,8 @@
                                 "done\n",
                                 "mkdir /var/lib/jenkins/jobs/newjob\n",
                                 "cp /tmp/config.xml /var/lib/jenkins/jobs/newjob/\n",
-                                "chown -R jenkins:jenkins  /var/lib/jenkins/jobs/newjob\n"
+                                "chown -R jenkins:jenkins  /var/lib/jenkins/jobs/newjob\n",
+                                "wget -O /tmp/myscript.txt https://raw.githubusercontent.com/kanchanna/jenkins-ami/master/myscript.txt\n"
                             ]
                         ]
                     }
